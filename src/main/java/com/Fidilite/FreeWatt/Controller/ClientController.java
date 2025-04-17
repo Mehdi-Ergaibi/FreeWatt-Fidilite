@@ -4,6 +4,7 @@ import com.Fidilite.FreeWatt.Entity.Client;
 import com.Fidilite.FreeWatt.Entity.MoneyTransaction;
 import com.Fidilite.FreeWatt.Service.ClientService;
 import com.Fidilite.FreeWatt.Service.PointTransactionService;
+import com.Fidilite.FreeWatt.dto.ClientDto;
 import com.Fidilite.FreeWatt.repositories.MoneyTransactionRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class ClientController {
     public ResponseEntity<String> convertPointsToMoney(@PathVariable Long clientId) {
         try {
             double money = pointTransactionService.convertPointsToMoney(clientId);
-            return ResponseEntity.ok("Conversion réussie ! Montant : " + money + " €");
+            return ResponseEntity.ok("Conversion réussie ! Montant : " + money + " Dh");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -43,17 +44,15 @@ public class ClientController {
         return moneyTransactionRepository.findByClientId(clientId);
     }
 
-    // Ajouter un client
     @PostMapping
     public ResponseEntity<Client> addClient(@RequestBody Client client) {
         Client newClient = clientService.addClient(client);
         return new ResponseEntity<>(newClient, HttpStatus.CREATED);
     }
 
-    // Récupérer tous les clients
     @GetMapping
-    public ResponseEntity<List<Client>> getAllClients() {
-        List<Client> clients = clientService.getAllClients();
+    public ResponseEntity<List<ClientDto>> getAllClients() {
+        List<ClientDto> clients = clientService.getAllClients();
         return new ResponseEntity<>(clients, HttpStatus.OK);
     }
 

@@ -2,12 +2,14 @@ package com.Fidilite.FreeWatt.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.Fidilite.FreeWatt.Entity.Achat;
 import com.Fidilite.FreeWatt.Entity.Client;
+import com.Fidilite.FreeWatt.dto.AchatDto;
 import com.Fidilite.FreeWatt.repositories.AchatRepository;
 import com.Fidilite.FreeWatt.repositories.ClientRepository;
 import com.Fidilite.FreeWatt.type.PointTransactionType;
@@ -33,6 +35,8 @@ public class AchatService {
 
         double pointsGagnes = calculerPoints(montant);
 
+        client.setTotalPoints(client.getTotalPoints() + (int) pointsGagnes);
+
         pointTransactionService.createPointTransaction(client, pointsGagnes, PointTransactionType.GAIN);
 
         Achat achat = new Achat();
@@ -47,11 +51,27 @@ public class AchatService {
         return montant / cvrRate;
     }
 
-    public List<Achat> getAllAchats() {
-        return achatRepository.findAll();
-    }
+    public List<AchatDto> getAllAchats() {
+    return achatRepository.findAll()
+        .stream()
+        .map(achat -> new AchatDto(
+            achat.getId(),
+            achat.getMontant(),
+            achat.getDate(),
+            achat.getClient().getId()
+        ))
+        .collect(Collectors.toList());
+}
 
-    public List<Achat> getAchatsByClient(Long clientId) {
-        return achatRepository.findByClientId(clientId);
+
+    public List<AchatDto> getAchatsByClient(Long clientId) {
+        return achatRepository.findByClientId(clientId).stream()
+        .map(achat -> new AchatDto(
+            achat.getId(),
+            achat.getMontant(),
+            achat.getDate(),
+            achat.getClient().getId()
+        ))
+        .collect(Collectors.toList());
     }
 }

@@ -2,11 +2,15 @@ package com.Fidilite.FreeWatt.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.Fidilite.FreeWatt.Entity.Achat;
 import com.Fidilite.FreeWatt.Entity.Client;
+import com.Fidilite.FreeWatt.Entity.PointTransaction;
+import com.Fidilite.FreeWatt.dto.ClientDto;
 import com.Fidilite.FreeWatt.repositories.ClientRepository;
 
 @Service
@@ -24,8 +28,21 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    public List<Client> getAllClients() {
-        return clientRepository.findAll();
+    public List<ClientDto> getAllClients() {
+        return clientRepository.findAll().stream()
+                .map(c -> new ClientDto(
+                        c.getId(),
+                        c.getNom(),
+                        c.getEmail(),
+                        c.getTelephone(),
+                        c.getTotalPoints(),
+                        c.getAchats().stream()
+                                .map(Achat::getId)
+                                .collect(Collectors.toList()),
+                        c.getTransactions().stream()
+                                .map(PointTransaction::getId)
+                                .collect(Collectors.toList())))
+                .collect(Collectors.toList());
     }
 
     public Optional<Client> getClientById(Long id) {
@@ -46,7 +63,7 @@ public class ClientService {
 
         client.setNom(clientDetails.getNom());
         client.setEmail(clientDetails.getEmail());
-        client.setTotalPoints(clientDetails.getTotalPoints()); 
+        client.setTotalPoints(clientDetails.getTotalPoints());
         return clientRepository.save(client);
     }
 

@@ -17,7 +17,6 @@ public class OffreController {
     @Autowired
     private OffreService offreService;
 
-    // Ajouter une offre
     @PostMapping
     public ResponseEntity<Offre> addOffre(@RequestParam String titre, 
                                           @RequestParam int pointsNecessaires, 

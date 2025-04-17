@@ -3,6 +3,7 @@ package com.Fidilite.FreeWatt.Entity;
 import java.time.LocalDateTime;
 
 import com.Fidilite.FreeWatt.type.PointTransactionType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -33,6 +34,7 @@ public class PointTransaction {
 
     @ManyToOne
     @JoinColumn(name = "client_id")
+    @JsonIgnore
     private Client client;
 
 }

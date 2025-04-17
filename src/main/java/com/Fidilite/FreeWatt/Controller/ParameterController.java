@@ -15,21 +15,18 @@ public class ParameterController {
     @Autowired
     private ParameterService parameterService;
 
-    // Récupérer le taux de conversion
     @GetMapping("/conversion-rate")
     public ResponseEntity<Double> getConversionRate() {
         double rate = parameterService.getConversionRate();
         return new ResponseEntity<>(rate, HttpStatus.OK);
     }
 
-    // Récupérer le seuil de conversion
     @GetMapping("/seuil-conversion")
     public ResponseEntity<Integer> getSeuilConversion() {
         int seuil = parameterService.getSeuilConversion();
         return new ResponseEntity<>(seuil, HttpStatus.OK);
     }
 
-    // Mettre à jour un paramètre
     @PutMapping("/{type}")
     public ResponseEntity<Void> updateParameter(@PathVariable String type, @RequestParam String newValue) {
         parameterService.updateParameter(ParameterType.valueOf(type), newValue);
