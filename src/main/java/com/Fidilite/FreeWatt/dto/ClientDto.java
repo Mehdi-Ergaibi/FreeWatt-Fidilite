@@ -14,6 +14,7 @@ public class ClientDto {
     private String email;
     private String telephone;
     private int totalPoints;
+    private double totalDepenses;
     private List<Long> acahtID;
     private List<Long> transactionID;
 }

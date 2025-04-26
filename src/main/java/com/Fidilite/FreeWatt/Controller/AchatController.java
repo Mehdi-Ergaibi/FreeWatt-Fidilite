@@ -5,6 +5,9 @@ import com.Fidilite.FreeWatt.Service.AchatService;
 import com.Fidilite.FreeWatt.dto.AchatDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +28,13 @@ public class AchatController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AchatDto>> getAllAchats() {
-        List<AchatDto> achats = achatService.getAllAchats();
-        return new ResponseEntity<>(achats, HttpStatus.OK);
+    public ResponseEntity<Page<AchatDto>> getAchats(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(achatService.getAchats(pageable, search));
     }
 
     @GetMapping("/client/{clientId}")
@@ -35,4 +42,5 @@ public class AchatController {
         List<AchatDto> achats = achatService.getAchatsByClient(clientId);
         return new ResponseEntity<>(achats, HttpStatus.OK);
     }
+    
 }

@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.Fidilite.FreeWatt.Entity.Achat;
 import com.Fidilite.FreeWatt.Entity.Client;
@@ -28,25 +30,73 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    public List<ClientDto> getAllClients() {
-        return clientRepository.findAll().stream()
+    public List<ClientDto> getClientsWithoutPagination() {
+        List<Client> cls = clientRepository.findAll();
+        return cls.stream()
+                .map(c -> new ClientDto(
+                    c.getId(),
+                    c.getNom(),
+                    c.getEmail(),
+                    c.getTelephone(),
+                    c.getTotalPoints(),
+                    c.getTotalDepenses(),
+                    c.getAchats().stream().map(Achat::getId).collect(Collectors.toList()),
+                    c.getTransactions().stream().map(PointTransaction::getId).collect(Collectors.toList())
+                ))
+                .collect(Collectors.toList());
+    }
+    
+
+    public Page<ClientDto> getClients(Pageable pageable, String search) {
+        Page<Client> clients;
+        if (search != null && !search.isEmpty()) {
+            clients = clientRepository.findByNomContainingIgnoreCase(search, pageable);
+        } else {
+            clients = clientRepository.findAll(pageable);
+        }
+
+        return clients.map(c -> new ClientDto(
+                c.getId(),
+                c.getNom(),
+                c.getEmail(),
+                c.getTelephone(),
+                c.getTotalPoints(),
+                c.getTotalDepenses(),
+                c.getAchats().stream().map(Achat::getId).collect(Collectors.toList()),
+                c.getTransactions().stream().map(PointTransaction::getId).collect(Collectors.toList())));
+    }
+
+    public Optional<ClientDto> getClientById(Long id) {
+        return clientRepository.findById(id)
                 .map(c -> new ClientDto(
                         c.getId(),
                         c.getNom(),
                         c.getEmail(),
                         c.getTelephone(),
                         c.getTotalPoints(),
+                        c.getTotalDepenses(),
                         c.getAchats().stream()
                                 .map(Achat::getId)
                                 .collect(Collectors.toList()),
                         c.getTransactions().stream()
                                 .map(PointTransaction::getId)
-                                .collect(Collectors.toList())))
-                .collect(Collectors.toList());
+                                .collect(Collectors.toList())));
     }
-
-    public Optional<Client> getClientById(Long id) {
-        return clientRepository.findById(id);
+    public Page<ClientDto> searchClients(String query, Pageable pageable) {
+        return clientRepository.findByNomContainingIgnoreCase(query, pageable)
+            .map(c -> new ClientDto(
+                c.getId(),
+                        c.getNom(),
+                        c.getEmail(),
+                        c.getTelephone(),
+                        c.getTotalPoints(),
+                        c.getTotalDepenses(),
+                        c.getAchats().stream()
+                                .map(Achat::getId)
+                                .collect(Collectors.toList()),
+                        c.getTransactions().stream()
+                                .map(PointTransaction::getId)
+                                .collect(Collectors.toList())));
     }
 
     public Optional<Client> getClientByEmail(String email) {

@@ -1,5 +1,6 @@
 package com.Fidilite.FreeWatt.Entity;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -25,6 +26,9 @@ public class Client {
     private String telephone;
 
     private int totalPoints;
+
+    private LocalDateTime derniereDateAchat;
+    private double totalDepenses;
 
     @OneToMany(mappedBy = "client")
     private List<Achat> achats;

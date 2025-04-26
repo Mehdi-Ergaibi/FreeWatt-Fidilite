@@ -2,6 +2,7 @@ package com.Fidilite.FreeWatt.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.Fidilite.FreeWatt.Entity.Client;
 import com.Fidilite.FreeWatt.Entity.MoneyTransaction;
 import com.Fidilite.FreeWatt.Entity.PointTransaction;
+import com.Fidilite.FreeWatt.dto.PointTransactionClientView;
 import com.Fidilite.FreeWatt.repositories.ClientRepository;
 import com.Fidilite.FreeWatt.repositories.MoneyTransactionRepository;
 import com.Fidilite.FreeWatt.repositories.PointTransactionRepository;
@@ -25,8 +27,6 @@ public class PointTransactionService {
 
     @Autowired
     private ParameterService parameterService;
-
-    
 
     @Autowired
     private MoneyTransactionRepository moneyTransactionRepository;
@@ -58,10 +58,8 @@ public class PointTransactionService {
         return moneyEquivalent;
     }
 
-
-
     public PointTransaction createPointTransaction(Client client, double points, PointTransactionType type) {
-        
+
         PointTransaction transaction = new PointTransaction();
         transaction.setClient(client);
         transaction.setPoints((int) points);
@@ -73,13 +71,17 @@ public class PointTransactionService {
         return pointTransactionRepository.save(transaction);
     }
 
+    public List<PointTransactionClientView> getPointTransactionsByClient(Long clientId) {
+        List<PointTransaction> transactions = pointTransactionRepository.findByClientId(clientId);
+        return transactions.stream()
+                .map(PointTransactionClientView::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<PointTransactionClientView> getAllPointTransactions() {
+        return pointTransactionRepository.findAll().stream()
+            .map(PointTransactionClientView::new)
+            .collect(Collectors.toList());
+    }
     
-
-    public List<PointTransaction> getPointTransactionsByClient(Long clientId) {
-        return pointTransactionRepository.findByClientId(clientId);
-    }
-
-    public List<PointTransaction> getAllPointTransactions() {
-        return pointTransactionRepository.findAll();
-    }
 }

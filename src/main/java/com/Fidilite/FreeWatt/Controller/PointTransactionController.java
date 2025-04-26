@@ -1,7 +1,7 @@
 package com.Fidilite.FreeWatt.Controller;
 
-import com.Fidilite.FreeWatt.Entity.PointTransaction;
 import com.Fidilite.FreeWatt.Service.PointTransactionService;
+import com.Fidilite.FreeWatt.dto.PointTransactionClientView;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,15 +19,15 @@ public class PointTransactionController {
 
     // Récupérer toutes les transactions de points
     @GetMapping
-    public ResponseEntity<List<PointTransaction>> getAllPointTransactions() {
-        List<PointTransaction> transactions = pointTransactionService.getAllPointTransactions();
+    public ResponseEntity<List<PointTransactionClientView>> getAllPointTransactions() {
+        List<PointTransactionClientView> transactions = pointTransactionService.getAllPointTransactions();
         return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 
     // Récupérer les transactions de points d'un client
     @GetMapping("/client/{clientId}")
-    public ResponseEntity<List<PointTransaction>> getPointTransactionsByClient(@PathVariable Long clientId) {
-        List<PointTransaction> transactions = pointTransactionService.getPointTransactionsByClient(clientId);
+    public ResponseEntity<List<PointTransactionClientView>> getPointTransactionsByClient(@PathVariable Long clientId) {
+        List<PointTransactionClientView> transactions = pointTransactionService.getPointTransactionsByClient(clientId);
         return new ResponseEntity<>(transactions, HttpStatus.OK);
     }
 }

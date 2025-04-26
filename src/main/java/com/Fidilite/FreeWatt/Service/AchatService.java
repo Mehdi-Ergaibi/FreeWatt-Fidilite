@@ -22,9 +22,12 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.transaction.Transactional;
 
+import org.springframework.util.StringUtils;
 import org.slf4j.Logger;
 /* import org.slf4j.LoggerFactory;
  */import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class AchatService {
@@ -56,8 +59,10 @@ public class AchatService {
 
         double pointsGagnes = calculerPoints(montant);
         double newTotalPoints = client.getTotalPoints() + pointsGagnes;
-        client.setTotalPoints((int) newTotalPoints); // Consider using double in Client entity
-
+        client.setTotalPoints((int) newTotalPoints);
+        client.setDerniereDateAchat(LocalDateTime.now());
+        client.setTotalDepenses(client.getTotalDepenses() + montant);
+        
         pointTransactionService.createPointTransaction(client, pointsGagnes, PointTransactionType.GAIN);
 
         Achat achat = new Achat();
@@ -131,19 +136,27 @@ public class AchatService {
 
     private double calculerPoints(double montant) {
         double cvrRate = parameterService.getConversionRate();
-        return montant / cvrRate;
+        double tranchesDe100 = Math.floor(montant / 100);
+        return tranchesDe100 * (100 / cvrRate);
     }
 
-    public List<AchatDto> getAllAchats() {
-        return achatRepository.findAll()
-                .stream()
-                .map(achat -> new AchatDto(
-                        achat.getId(),
-                        achat.getMontant(),
-                        achat.getDate(),
-                        achat.getClient().getId()))
-                .collect(Collectors.toList());
+    public Page<AchatDto> getAchats(Pageable pageable, String search) {
+        Page<Achat> achats;
+        
+        if (StringUtils.hasText(search)) {
+            achats = achatRepository.findByClientNomContainingIgnoreCase(search, pageable);
+        } else {
+            achats = achatRepository.findAll(pageable);
+        }
+        
+        return achats.map(a -> new AchatDto(
+            a.getId(),
+            a.getMontant(),
+            a.getDate(),
+            a.getClient().getId()
+        ));
     }
+    
 
     public List<AchatDto> getAchatsByClient(Long clientId) {
         return achatRepository.findByClientId(clientId).stream()
@@ -154,4 +167,5 @@ public class AchatService {
                         achat.getClient().getId()))
                 .collect(Collectors.toList());
     }
+    
 }

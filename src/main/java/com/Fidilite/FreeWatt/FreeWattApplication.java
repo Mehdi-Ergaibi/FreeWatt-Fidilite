@@ -12,6 +12,4 @@ public class FreeWattApplication {
 		SpringApplication.run(FreeWattApplication.class, args);
 	}
 
-	
-
-}
+}	
